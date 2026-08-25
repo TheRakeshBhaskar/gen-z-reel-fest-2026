@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jury Ranking V4 - GEN Z REEL FEST 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#101828;background:#f6f7fb}
+*{box-sizing:border-box}body{margin:0}.wrap{max-width:1200px;margin:auto;padding:20px 14px 50px}
+.card{background:#fff;border:1px solid #e4e7ec;border-radius:16px;padding:18px;margin:14px 0;box-shadow:0 8px 25px #1018280a}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.stat{padding:16px;border-radius:14px;background:#f8f9fc}.num{font-size:30px;font-weight:800;margin-top:4px}
+.btn{border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer;background:#7c3aed;color:#fff}.dark{background:#111827}.green{background:#059669}.danger{background:#b42318}
+input,select{padding:10px;border:1px solid #d0d5dd;border-radius:9px;width:100%}.filters{display:grid;grid-template-columns:1fr 180px 180px;gap:10px}
+.table{overflow:auto}.table table{width:100%;border-collapse:collapse;min-width:850px}.table th,.table td{padding:11px 9px;border-bottom:1px solid #eee;text-align:left}.table th{font-size:13px;color:#667085;background:#fafafa;position:sticky;top:0}
+.rank{font-size:22px;font-weight:800}.top{background:#fffbeb}.muted{color:#667085}.ok{background:#ecfdf3;padding:12px;border-radius:9px}.err{background:#fef2f2;padding:12px;border-radius:9px}
+.badge{display:inline-block;padding:4px 8px;border-radius:99px;font-size:12px;font-weight:700;background:#eef2ff}.score{font-weight:800;font-size:18px}
+@media(max-width:700px){.filters{grid-template-columns:1fr}.wrap{padding:10px}.card{padding:14px}}
+</style>
+</head>
+<body>
+<main class="wrap" id="app"></main>
+<script>
+const CONFIG={SUPABASE_URL:'https://tewprfdirrhpaowvqyhj.supabase.co',SUPABASE_PUBLISHABLE_KEY:'sb_publishable_-9c3fvGnXlWRvKESi042iA_PYkj9e7j'};
+const sb=supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_PUBLISHABLE_KEY);
+const app=document.getElementById('app');
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+let all=[];
+
+async function init(){
+ const {data:{user}}=await sb.auth.getUser();
+ if(!user)return login();
+ const {data:p}=await sb.from('profiles').select('role').eq('id',user.id).maybeSingle();
+ if(!p||!['admin','manager','judge'].includes(p.role))return app.innerHTML='<div class="card err"><h2>Access denied</h2><p>Admin/Jury access required.</p></div>';
+ dashboard();
+}
+function login(){app.innerHTML='<div class="card"><h2>🔐 Jury Login</h2><p class="muted">Use your registered jury/admin email.</p><input id="email" type="email" placeholder="Your email"><br><br><button class="btn" onclick="send()">SEND LOGIN LINK</button><div id="msg"></div></div>'}
+async function send(){const e=document.getElementById('email').value.trim();if(!e)return;const {error}=await sb.auth.signInWithOtp({email:e,options:{emailRedirectTo:location.href.split('#')[0]}});document.getElementById('msg').innerHTML=error?'<div class="err">'+esc(error.message)+'</div>':'<div class="ok">Login link sent. Check your email.</div>'}
+async function dashboard(){
+ app.innerHTML='<div class="card"><h1>🏆 Jury Ranking V4</h1><p>Automatic ranking based on the jury score out of 100.</p><div id="stats"></div></div><div class="card"><div class="filters"><input id="search" placeholder="Search registration, name or reel..." oninput="render()"><select id="status" onchange="render()"><option value="all">All entries</option><option value="finalist">Finalists only</option><option value="scored">Scored only</option><option value="unscored">Unscored only</option></select><select id="limit" onchange="render()"><option value="10">Top 10</option><option value="25">Top 25</option><option value="50">Top 50</option><option value="all">All</option></select></div></div><div class="card"><div id="table"></div></div><div class="card"><button class="btn dark" onclick="logout()">LOGOUT</button></div>';
+ const {data,error}=await sb.from('entries').select('id,registration_id,name,title,district,category,status,is_finalist,jury_creativity,jury_content,jury_editing,jury_presentation,jury_local_connect,jury_total,created_at').order('jury_total',{ascending:false,nullsFirst:false}).order('created_at',{ascending:true});
+ if(error)return app.innerHTML='<div class="card err">'+esc(error.message)+'</div>';
+ all=data||[];render();
+}
+function render(){
+ const q=(document.getElementById('search')?.value||'').toLowerCase();const mode=document.getElementById('status')?.value||'all';const lim=document.getElementById('limit')?.value||'10';
+ let rows=all.filter(x=>{const text=[x.registration_id,x.name,x.title].join(' ').toLowerCase();if(q&&!text.includes(q))return false;if(mode==='finalist'&&!x.is_finalist)return false;if(mode==='scored'&&x.jury_total==null)return false;if(mode==='unscored'&&x.jury_total!=null)return false;return true;});
+ rows.sort((a,b)=>(b.jury_total??-1)-(a.jury_total??-1)||String(a.created_at).localeCompare(String(b.created_at)));
+ const scored=all.filter(x=>x.jury_total!=null).sort((a,b)=>b.jury_total-a.jury_total);let rank=0,last=null;const rankMap={};scored.forEach((x,i)=>{if(x.jury_total!==last){rank=i+1;last=x.jury_total}rankMap[x.id]=rank});
+ const finalists=all.filter(x=>x.is_finalist).length;const scoredFinalists=all.filter(x=>x.is_finalist&&x.jury_total!=null).length;
+ document.getElementById('stats').innerHTML='<div class="grid"><div class="stat"><b>Total Entries</b><div class="num">'+all.length+'</div></div><div class="stat"><b>Finalists</b><div class="num">'+finalists+'</div></div><div class="stat"><b>Scored</b><div class="num">'+all.filter(x=>x.jury_total!=null).length+'</div></div><div class="stat"><b>Scored Finalists</b><div class="num">'+scoredFinalists+'</div></div></div>';
+ if(lim!=='all')rows=rows.slice(0,Number(lim));
+ document.getElementById('table').innerHTML=rows.length?'<div class="table"><table><tr><th>Rank</th><th>Registration</th><th>Participant</th><th>Reel</th><th>District</th><th>Status</th><th>Jury Total</th><th>Action</th></tr>'+rows.map(x=>{const r=rankMap[x.id]??'-';return '<tr class="'+(r<=3?'top':'')+'"><td><span class="rank">'+r+'</span></td><td>'+esc(x.registration_id)+'</td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.title)+'</td><td>'+esc(x.district)+'</td><td><span class="badge">'+esc(x.status)+'</span></td><td><span class="score">'+(x.jury_total==null?'-':x.jury_total+'/100')+'</span></td><td><button class="btn" onclick="score(\''+esc(x.registration_id)+'\')">SCORE</button></td></tr>'}).join('')+'</table></div>':'<p class="muted">No entries found.</p>';
+}
+async function score(id){const {data:x}=await sb.from('entries').select('*').eq('registration_id',id).single();if(!x)return;app.innerHTML='<div class="card"><h2>🎬 Score: '+esc(x.title||x.registration_id)+'</h2><p><b>'+esc(x.name)+'</b> • '+esc(x.district)+'</p><div class="grid">'+field('Creativity','creativity',x.jury_creativity)+' '+field('Content','content',x.jury_content)+' '+field('Editing','editing',x.jury_editing)+' '+field('Presentation','presentation',x.jury_presentation)+' '+field('Local Connect','local_connect',x.jury_local_connect)+'</div><br><button class="btn" onclick="save(\''+esc(id)+'\')">SAVE SCORE</button> <button class="btn dark" onclick="dashboard()">BACK TO RANKING</button><div id="msg"></div></div>'}
+function field(label,id,v){return '<div><label><b>'+label+'</b> (0-20)</label><input id="'+id+'" type="number" min="0" max="20" value="'+(v??0)+'"></div>'}
+async function save(id){const vals=['creativity','content','editing','presentation','local_connect'].map(k=>Math.max(0,Math.min(20,Number(document.getElementById(k).value)||0)));const patch={jury_creativity:vals[0],jury_content:vals[1],jury_editing:vals[2],jury_presentation:vals[3],jury_local_connect:vals[4],jury_total:vals.reduce((a,b)=>a+b,0)};const {error}=await sb.from('entries').update(patch).eq('registration_id',id);document.getElementById('msg').innerHTML=error?'<div class="err">'+esc(error.message)+'</div>':'<div class="ok">Score saved. Total: '+patch.jury_total+'/100</div>';if(!error)setTimeout(dashboard,700)}
+async function logout(){await sb.auth.signOut();login()}
+init();
+</script>
+</body>
+</html>
