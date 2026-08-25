@@ -1,0 +1,48 @@
+name: Fix registration completion UI
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Patch registration completion flow
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          old_init = "loadSettings().then(async()=>{await completePendingRegistration();page('home')})"
+          new_init = "loadSettings().then(async()=>{const completed=await completePendingRegistration();if(!completed)page('home')})"
+          if old_init in s:
+              s = s.replace(old_init, new_init, 1)
+
+          pattern = r"async function completePendingRegistration\(\)\{.*?\}\nasync function page\(p\)"
+          replacement = """async function completePendingRegistration(){const raw=localStorage.getItem('pending_genz_registration');if(!raw)return false;const {data:{session}}=await sb.auth.getSession();if(!session?.user)return false;let x;try{x=JSON.parse(raw)}catch{localStorage.removeItem('pending_genz_registration');return false}if(x.email&&session.user.email&&x.email.toLowerCase()!==session.user.email.toLowerCase())return false;x.user_id=session.user.id;x.consent=true;const {data:r,error}=await sb.from('entries').insert(x).select('registration_id').single();if(!error){localStorage.removeItem('pending_genz_registration');app.innerHTML=`<div class=\"card\">${notice('Registration successful. ID: '+r.registration_id+' | Your entry has been submitted.')}</div>`;return true}if(error.code==='23505'){localStorage.removeItem('pending_genz_registration');app.innerHTML=`<div class=\"card\">${notice('Registration already submitted successfully.')}</div>`;return true}console.error(error);app.innerHTML=notice(error.message||'Registration could not be completed.','err');return false}
+async function page(p)"""
+          s2, n = re.subn(pattern, replacement, s, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit('Could not locate completePendingRegistration block')
+          s = s2
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit fix and remove one-time workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git rm .github/workflows/fix-registration-ui.yml
+          git add index.html
+          git commit -m "Fix automatic registration completion after email login"
+          git push
