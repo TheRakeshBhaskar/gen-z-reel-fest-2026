@@ -1,0 +1,36 @@
+name: Registration UI fix
+on: [push]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix index.html
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = "loadSettings().then(async()=>{await completePendingRegistration();page('home')})"
+          new = "loadSettings().then(async()=>{const completed=await completePendingRegistration();if(!completed)page('home')})"
+          if old in s:
+              s = s.replace(old, new, 1)
+          start = s.find('async function completePendingRegistration(){')
+          end = s.find('\nasync function page(p)', start)
+          if start < 0 or end < 0:
+              raise SystemExit('registration function not found')
+          fn = """async function completePendingRegistration(){const raw=localStorage.getItem('pending_genz_registration');if(!raw)return false;const {data:{session}}=await sb.auth.getSession();if(!session?.user)return false;let x;try{x=JSON.parse(raw)}catch{localStorage.removeItem('pending_genz_registration');return false}if(x.email&&session.user.email&&x.email.toLowerCase()!==session.user.email.toLowerCase())return false;x.user_id=session.user.id;x.consent=true;const {data:r,error}=await sb.from('entries').insert(x).select('registration_id').single();if(!error){localStorage.removeItem('pending_genz_registration');app.innerHTML=`<div class=\"card\">${notice('Registration successful. ID: '+r.registration_id+' | Your entry has been submitted.')}</div>`;return true}if(error.code==='23505'){localStorage.removeItem('pending_genz_registration');app.innerHTML=`<div class=\"card\">${notice('Registration already submitted successfully.')}</div>`;return true}console.error(error);app.innerHTML=notice(error.message||'Registration could not be completed.','err');return false}"
+          s = s[:start] + fn + s[end:]
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git rm .github/workflows/fix-registration-ui.yml || true
+          git rm .github/workflows/fix-registration-ui-2.yml || true
+          git commit -m "Fix automatic registration completion after email login" || exit 0
+          git push
