@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="mr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#312e81"><title>🏆 GEN Z REEL FEST 2026 - Official Results</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f6f7fb;color:#101828}.hero{padding:42px 15px;text-align:center;color:#fff;background:linear-gradient(135deg,#111827,#312e81,#7c3aed)}.hero h1{font-size:clamp(30px,6vw,58px);margin:8px 0}.hero p{margin:5px;opacity:.92}.wrap{max-width:1100px;margin:20px auto;padding:0 12px}.card{background:#fff;border:1px solid #e4e7ec;border-radius:18px;padding:18px;margin:13px 0;box-shadow:0 8px 25px #1018280a}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.stat{background:#f8f9fc;border-radius:14px;padding:14px}.num{font-size:28px;font-weight:900;margin-top:4px}.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:end}.place{border:1px solid #e4e7ec;border-radius:18px;padding:18px;text-align:center;background:#fff}.place.first{padding-top:28px;padding-bottom:28px;background:#fffbeb}.medal{font-size:44px}.award{font-weight:800}.name{font-size:22px;font-weight:900;margin:8px 0}.id{font-size:12px;background:#eef2ff;padding:5px 9px;border-radius:99px;display:inline-block;overflow-wrap:anywhere}.muted{color:#667085}.table{overflow:auto}.table table{width:100%;border-collapse:collapse;min-width:750px}.table th,.table td{padding:11px;border-bottom:1px solid #eee;text-align:left}.table th{background:#f9fafb}.rank{font-size:22px;font-weight:900}.top{background:#fffbeb}.empty{text-align:center;padding:35px}.notice{padding:16px;border-radius:12px;background:#fef2f2;color:#b42318;white-space:pre-wrap}..updated{text-align:center;font-size:13px;color:#667085}.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.btn{border:0;border-radius:10px;padding:11px 15px;font-weight:800;cursor:pointer;background:#7c3aed;color:#fff}.dark{background:#111827}.loading{display:flex;justify-content:center;align-items:center;gap:10px}.spinner{width:18px;height:18px;border:3px solid #ddd;border-top-color:#7c3aed;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.badge{display:inline-block;font-size:12px;padding:4px 8px;border-radius:99px;background:#ecfdf3;color:#067647;font-weight:800}@media(max-width:700px){.grid{grid-template-columns:1fr 1fr}.podium{grid-template-columns:1fr}.place.first{order:-1}.card{padding:14px}}@media(max-width:430px){.grid{grid-template-columns:1fr}.hero h1{font-size:30px}}
+</style></head>
+<body>
+<header class="hero"><div>🏆 Bhandara × Gondia • 2026</div><h1>GEN Z REEL FEST 2026</h1><p>तुमची कल्पना. तुमची Reel. तुमचा मंच.</p><p><b>OFFICIAL RESULTS</b></p></header>
+<main class="wrap"><section id="app"><div class="card empty loading"><span class="spinner"></span><span>Results loading...</span></div></section></main>
+<script>
+(function(){
+'use strict';
+var U='https://tewprfdirrhpaowvqyhj.supabase.co',K='sb_publishable_-9c3fvGnXlWRvKESi042iA_PYkj9e7j',app=document.getElementById('app');
+var fallback=[
+ {registration_id:'RB-GZR-2026-00006',name:'Wartaa Dotcom',rank:1,award:'Winner',title:'The',district:'Bhandara',category:'Generic',public_votes:0},
+ {registration_id:'RB-GZR-2026-00007',name:'Rakesh Bhaskar',rank:2,award:'1st Runner Up',title:'THEEEE',district:'Bhandara',category:'Generic',public_votes:0},
+ {registration_id:'RB-GZR-2026-00008',name:'Deepa',rank:3,award:'2nd Runner Up',title:'dfaggaagag',district:'Gondia',category:'Generic',public_votes:0}
+];
+function esc(v){return String(v==null?'':v).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#039;'}[c]||c})}
+function req(table,params){return fetch(U+'/rest/v1/'+table+'?'+new URLSearchParams(params||{}),{headers:{apikey:K,Authorization:'Bearer '+K,Accept:'application/json'},cache:'no-store'}).then(function(r){return r.text().then(function(t){var d=[];try{d=t?JSON.parse(t):[]}catch(e){}if(!r.ok)throw new Error('Supabase '+r.status);return d})})}
+function timeout(p,ms){return Promise.race([p,new Promise(function(_,reject){setTimeout(function(){reject(new Error('timeout'))},ms)})])}
+function errorBox(m){app.innerHTML='<div class="card notice"><h2>⚠️ Results could not be loaded</h2><p>'+esc(m)+'</p><div class="actions"><button class="btn" onclick="loadOfficialResults()">↻ TRY AGAIN</button></div></div>'}
+function merge(results,entries){var by={};(entries||[]).forEach(function(e){by[e.registration_id]=e});return results.map(function(r){var e=by[r.registration_id]||{};return Object.assign({},r,{title:e.title||r.title||'',district:e.district||r.district||'',category:e.category||r.category||'',public_votes:e.public_votes!=null?e.public_votes:(r.public_votes!=null?r.public_votes:0)})})}
+function render(results,live){
+ if(!results.length){errorBox('No published results were found.');return}
+ var votes=results.reduce(function(a,x){return a+(Number(x.public_votes)||0)},0);
+ var podium=results.slice(0,3).map(function(x,i){return '<div class="place '+(i===0?'first':'')+'"><div class="medal">'+(i===0?'🥇':i===1?'🥈':'🥉')+'</div><div class="award">'+esc(x.award||('Rank '+x.rank))+'</div><div class="name">'+esc(x.name)+'</div><span class="id">'+esc(x.registration_id)+'</span><p><b>Reel:</b> '+esc(x.title||'-')+'</p><p class="muted">'+esc(x.district||'-')+(x.category?' • '+esc(x.category):'')+'</p><b>❤️ '+esc(x.public_votes||0)+' public votes</b></div>}).join('');
+ var rows=results.map(function(x,i){return '<tr class="'+(i<3?'top':'')+'"><td><span class="rank">'+esc(x.rank||i+1)+'</span></td><td>'+esc(x.registration_id)+'</td><td><b>'+esc(x.name)+'</b></td><td>'+esc(x.award||'-')+'</td><td>'+esc(x.title||'-')+'</td><td>'+esc(x.district||'-')+'</td><td>'+esc(x.category||'-')+'</td></tr>'}).join('');
+ app.innerHTML='<div class="card"><div class="grid"><div class="stat"><b>Published Winners</b><div class="num">'+results.length+'</div></div><div class="stat"><b>Public Votes</b><div class="num">'+votes+'</div></div><div class="stat"><b>Data Status</b><div style="margin-top:8px"><span class="badge">'+(live?'LIVE DATABASE':'PUBLISHED BACKUP')+'</span></div></div></div></div><div class="card"><h2 style="text-align:center">🥇 TOP 3 WINNERS</h2><div class="podium">'+podium+'</div></div><div class="card"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap"><h2>📊 Official Ranking</h2><div class="actions"><button class="btn dark" onclick="window.print()">🖨️ Print / PDF</button><button class="btn" onclick="loadOfficialResults()">↻ Refresh</button></div></div><div class="table"><table><tr><th>Rank</th><th>Registration ID</th><th>Name</th><th>Award</th><th>Reel</th><th>District</th><th>Category</th></tr>'+rows+'</table></div></div><div class="card" style="text-align:center"><h2>🎉 Congratulations!</h2><p>GEN Z REEL FEST 2026</p><p class="muted">Official results</p></div><div class="updated">Last checked: '+new Date().toLocaleString()+'</div>';
+}
+async function load(){
+ app.innerHTML='<div class="card empty loading"><span class="spinner"></span><span>Loading official results...</span></div>';
+ try{
+  var results=await timeout(req('results',{select:'registration_id,name,rank,award',order:'rank.asc'}),6000);
+  var merged=results;
+  try{var entries=await timeout(req('entries',{select:'registration_id,name,title,district,category,public_votes,is_finalist'}),6000);merged=merge(results,entries)}catch(e){merged=merge(results,[])}
+  render(merged,true);
+ }catch(e){console.warn(e);render(fallback,false)}
+}
+window.loadOfficialResults=load;load();setInterval(load,30000);
+})();
+</script></body></html>
