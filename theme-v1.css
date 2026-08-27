@@ -1,0 +1,30 @@
+/* GEN Z REEL FEST 2026 • Theme V1
+   Visual-only layer. No application logic changes. */
+:root{--gz-bg:#090816;--gz-surface:#12102a;--gz-surface2:#1b1738;--gz-text:#f8f7ff;--gz-muted:#b9b4d0;--gz-purple:#8b5cf6;--gz-pink:#ec4899;--gz-orange:#f59e0b;--gz-border:rgba(255,255,255,.12);--gz-shadow:0 18px 50px rgba(0,0,0,.28)}
+html{background:var(--gz-bg)}
+body{background:radial-gradient(circle at 15% 0%,rgba(139,92,246,.20),transparent 32%),radial-gradient(circle at 90% 10%,rgba(236,72,153,.15),transparent 30%),var(--gz-bg)!important;color:var(--gz-text)!important}
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#0b0920 0%,#26134f 48%,#641044 100%)!important;padding:72px 20px!important}
+.hero:after{content:"";position:absolute;inset:auto -10% -65% -10%;height:180px;background:linear-gradient(90deg,transparent,rgba(245,158,11,.22),transparent);transform:rotate(-5deg);pointer-events:none}
+.hero h1{font-weight:950;letter-spacing:-1.5px;text-shadow:0 8px 35px rgba(0,0,0,.35)}
+.hero p{color:#eeeaff}
+nav{background:rgba(9,8,22,.88)!important;border-bottom:1px solid var(--gz-border);backdrop-filter:blur(14px)}
+nav button{background:transparent!important;color:var(--gz-text)!important;border:1px solid transparent!important}
+nav button:hover{background:rgba(139,92,246,.16)!important;border-color:rgba(139,92,246,.35)!important}
+.wrap{max-width:1180px!important}
+.card{background:linear-gradient(145deg,rgba(27,23,56,.96),rgba(18,16,42,.96))!important;border:1px solid var(--gz-border)!important;border-radius:20px!important;box-shadow:var(--gz-shadow)!important;color:var(--gz-text)!important}
+.card h2,.card h3{color:#fff}
+.card p,.muted{color:var(--gz-muted)!important}
+.field input,.field textarea,.field select{background:#0e0c20!important;color:#fff!important;border:1px solid rgba(255,255,255,.16)!important;border-radius:12px!important;outline:none}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gz-purple)!important;box-shadow:0 0 0 3px rgba(139,92,246,.14)}
+.btn{background:linear-gradient(135deg,var(--gz-orange),#f97316)!important;color:#17100a!important;border-radius:12px!important;box-shadow:0 8px 22px rgba(245,158,11,.18)}
+.btn.purple,.primary{background:linear-gradient(135deg,var(--gz-purple),var(--gz-pink))!important;color:#fff!important}
+.btn.dark{background:#fff!important;color:#17132d!important}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.05)}
+.links .btn{background:rgba(255,255,255,.07)!important;color:#fff!important;border:1px solid var(--gz-border)!important}
+.table table{color:#fff}.table td,.table th{border-bottom-color:var(--gz-border)!important}
+.time{background:rgba(255,255,255,.09)!important;border:1px solid var(--gz-border)}
+.banner{border:1px solid var(--gz-border);box-shadow:var(--gz-shadow)}
+.ok{background:rgba(18,183,106,.12)!important;color:#d9ffe9;border:1px solid rgba(18,183,106,.3)}
+.err{background:rgba(239,68,68,.12)!important;color:#ffe2e2;border:1px solid rgba(239,68,68,.3)}
+.success{border-color:#12b76a!important}
+@media(max-width:650px){.hero{padding:52px 16px!important}.card{border-radius:16px!important;padding:18px!important}nav{padding:8px}.btn{width:100%}.links .btn{width:auto}}
