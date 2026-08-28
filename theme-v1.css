@@ -9,5 +9,11 @@ body{background:radial-gradient(circle at 15% 0%,rgba(139,92,246,.20),transparen
 .site-logo{display:none!important}
 .hero-logo-label{display:none!important}
 nav{box-shadow:0 4px 18px rgba(0,0,0,.08)}
-.card{box-shadow:var(--gz-shadow)}
+/* Content cards have a light background, so their text must remain dark. */
+.card{box-shadow:var(--gz-shadow);color:#101828!important}
+.card h2,.card h3,.card p,.card label,.card b,.card strong{color:#101828!important}
+.card a:not(.btn){color:#312e81!important}
+.card .ok{color:#067647!important}
+.card .err{color:#b42318!important}
+.success h2{color:#067647!important}
 @media(max-width:650px){.hero{padding:55px 16px!important}}
