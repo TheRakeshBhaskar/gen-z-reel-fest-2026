@@ -16,4 +16,6 @@ nav{box-shadow:0 4px 18px rgba(0,0,0,.08)}
 .card .ok{color:#067647!important}
 .card .err{color:#b42318!important}
 .success h2{color:#067647!important}
-@media(max-width:650px){.hero{padding:55px 16px!important}}
+/* Social follow section. */
+body:after{content:'Follow Us  •  Instagram  |  Facebook  |  YouTube';display:block;text-align:center;padding:24px 16px 30px;margin-top:10px;background:#0b0920;color:#fff;font-weight:800;font-size:15px;letter-spacing:.2px}
+@media(max-width:650px){.hero{padding:55px 16px!important}body:after{font-size:14px;padding:22px 10px 26px}}
